@@ -55,9 +55,9 @@ def valleyEmphasis():
     otsuThresh = np.argmax(otsu)
 
 
-    (thresh, valleyImage) = cv2.threshold(img_gray,valueV,255,cv2.THRESH_BINARY)
-    (thresh, otsuImage) = cv2.threshold(img_gray,valueO,255,cv2.THRESH_BINARY)
-    cv2.imshow("Valley T= " + str(valueV), valleyImage)
+    (thresh, valleyImage) = cv2.threshold(img_gray,valleyThresh,255,cv2.THRESH_BINARY)
+    (thresh, otsuImage) = cv2.threshold(img_gray,otsuThresh,255,cv2.THRESH_BINARY)
+    cv2.imshow("Valley T= " + str(valleyThresh), valleyImage)
     #cv2.imshow("Otsu T= " + str(valueO), otsuImage)
     cv2.waitKey()
     cv2.destroyAllWindows()
