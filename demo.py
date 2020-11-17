@@ -5,6 +5,7 @@ import cv2
 
 main = tk.Tk();
 main.title("Demo Valley-Emphasis")
+main.geometry('300x250')
 
 def selectImg():
     imgFile = filedialog.askopenfilename(initialdir = 'C:\\Users\\ACER\\Desktop\\xla', title="Chon anh",
@@ -21,58 +22,58 @@ def displayImg(src):
     global image 
     image = img
 
-    
-arrayVariance = []
+
 def valleyEmphasis():
+    valley = []
+    otsu = []
+
     img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     histogram = cv2.calcHist([img_gray], [0], None, [255], [0,255]);
-    cv2.imshow("anh xam", img_gray)
 
     height = image.shape[0]
     width = image.shape[1]
-    sumPixels = height * width; 
+    totalPixel = height * width; 
 
+    weightB, weightF = 0,0
     for i in range(len(histogram)):
         bg,fg = np.split(histogram, [i])
 
-        weightB = np.sum(bg)/sumPixels
-        weightF = np.sum(fg)/sumPixels
+        weightB = np.sum(bg)/totalPixel 
+        weightF = np.sum(fg)/totalPixel 
 
-        meanB = np.sum([i*p for i,p in enumerate(bg)])/np.sum(bg)
-        meanF = np.sum([i*p for i,p in enumerate(fg)])/np.sum(fg)
-        meanB, meanF = np.nan_to_num(meanB),np.nan_to_num(meanF)
+        meanB = np.sum([i*p for i,p in enumerate(bg)])/weightB
+        meanF = np.sum([i*p for i,p in enumerate(fg)])/weightF
+        meanB, meanF = np.nan_to_num(meanB), np.nan_to_num(meanF)
 
-        varianceB = np.sum([(j-meanB)**2*t for j,t in enumerate(bg)])/np.sum(bg) 
-        varianceF = np.sum([(j-meanF)**2*t for j,t in enumerate(fg)])/np.sum(fg) 
-        varianceB, varianceF = np.nan_to_num(varianceB),np.nan_to_num(varianceF)
+        #--------------------------------------------
+        pT = histogram[i]/totalPixel 
+        #--------------------------------------------
+        otsu.append(weightB*weightF*(meanB-meanF)**2);
+        valley.append((1-pT)*(weightB*weightF*(meanB-meanF)**2));
 
-        varainceT = varianceB/sumPixels
-        arrayVariance.append((1-varainceT)*weightB*varianceB + weightF*varianceF);
+    valleyThresh = np.argmax(valley)
+    otsuThresh = np.argmax(otsu)
 
 
-    varianceMin = np.argmin(arrayVariance)
-    print(varianceMin)
-    label = tk.Label(text="T=" + str(varianceMin))
-    label.grid(row = 2, column = 0, pady = 1, padx = 2) 
-    (thresh, finalImage) = cv2.threshold(img_gray,varianceMin,255,cv2.THRESH_BINARY)
-    cv2.imshow("valley", finalImage)
+    (thresh, valleyImage) = cv2.threshold(img_gray,valueV,255,cv2.THRESH_BINARY)
+    (thresh, otsuImage) = cv2.threshold(img_gray,valueO,255,cv2.THRESH_BINARY)
+    cv2.imshow("Valley T= " + str(valueV), valleyImage)
+    #cv2.imshow("Otsu T= " + str(valueO), otsuImage)
+    cv2.waitKey()
+    cv2.destroyAllWindows()
 
 def menuBar():
-    #menubar = Menu(main)  
-    #menubar.add_command(label="Open Image", command=selectImg )  
-    #menubar.add_command(label="Valley-Emphasis", command=valleyEmphasis )  
-    #main.config(menu=menubar)  
+    title = tk.Label(text="Valley-emphasis", font=15, pady=10)
+    title.pack()
 
-    btnOpen = tk.Button(text="Open Image", width=10, height=4, bg="#5882FA", fg="white", command=selectImg)
-    btnHandle = tk.Button(text="Valley-Emphasis", width=20, height=4, bg="#FF8000", command=valleyEmphasis)
-    btnOpen.grid(row = 1, column = 0, pady = 1) 
-    btnHandle.grid(row = 1, column = 1, pady = 1) 
-      
-
+    btnOpen = tk.Button(text="Open Image", width=15, height=3, bg="#809fff",command=selectImg)
+    btnHandle = tk.Button(text="Valley-emphasis", width=15, height=3, bg='#ff9933', command=valleyEmphasis)
+    btnOpen.pack(padx=10, pady=10)
+    btnHandle.pack(padx=10, pady=10)
+  
 menuBar()
-
+main.resizable(True, True)
 main.mainloop()
-
 
 
 
