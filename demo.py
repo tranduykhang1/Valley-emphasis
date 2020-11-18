@@ -2,13 +2,14 @@ import tkinter as tk
 import numpy as np
 from tkinter import filedialog, Menu
 import cv2
+from matplotlib import pyplot as plt
 
 main = tk.Tk();
 main.title("Demo Valley-Emphasis")
 main.geometry('300x250')
 
 def selectImg():
-    imgFile = filedialog.askopenfilename(initialdir = 'C:\\Users\\ACER\\Desktop\\xla', title="Chon anh",
+    imgFile = filedialog.askopenfilename(initialdir = 'C:\\Users\\ACER\\Desktop\\xla\\images', title="Chọn ảnh",
        filetypes = (("jpeg files, png files","*.jpg, *.png"),("all files","*.*"))
     )
     displayImg(imgFile)
@@ -25,16 +26,16 @@ def displayImg(src):
 
 def valleyEmphasis():
     valley = []
-    otsu = []
 
     img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     histogram = cv2.calcHist([img_gray], [0], None, [255], [0,255]);
+
+    plt.plot(histogram)
 
     height = image.shape[0]
     width = image.shape[1]
     totalPixel = height * width; 
 
-    weightB, weightF = 0,0
     for i in range(len(histogram)):
         bg,fg = np.split(histogram, [i])
 
@@ -45,20 +46,20 @@ def valleyEmphasis():
         meanF = np.sum([i*p for i,p in enumerate(fg)])/weightF
         meanB, meanF = np.nan_to_num(meanB), np.nan_to_num(meanF)
 
+
         #--------------------------------------------
         pT = histogram[i]/totalPixel 
         #--------------------------------------------
-        otsu.append(weightB*weightF*(meanB-meanF)**2);
+        #valley.append((1-pT)*(weightB*weightF*(meanB-meanF)**2));
         valley.append((1-pT)*(weightB*weightF*(meanB-meanF)**2));
+        
+
 
     valleyThresh = np.argmax(valley)
-    otsuThresh = np.argmax(otsu)
-
 
     (thresh, valleyImage) = cv2.threshold(img_gray,valleyThresh,255,cv2.THRESH_BINARY)
-    (thresh, otsuImage) = cv2.threshold(img_gray,otsuThresh,255,cv2.THRESH_BINARY)
     cv2.imshow("Valley T= " + str(valleyThresh), valleyImage)
-    #cv2.imshow("Otsu T= " + str(valueO), otsuImage)
+    plt.show()
     cv2.waitKey()
     cv2.destroyAllWindows()
 
