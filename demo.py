@@ -39,19 +39,19 @@ def valleyEmphasis():
     for i in range(len(histogram)):
         bg,fg = np.split(histogram, [i])
 
-        weightB = np.sum(bg)/totalPixel 
-        weightF = np.sum(fg)/totalPixel 
+        weight1 = np.sum(bg)/totalPixel 
+        weight2 = np.sum(fg)/totalPixel 
 
-        meanB = np.sum([i*p for i,p in enumerate(bg)])/weightB
-        meanF = np.sum([i*p for i,p in enumerate(fg)])/weightF
-        meanB, meanF = np.nan_to_num(meanB), np.nan_to_num(meanF)
+        mean1 = np.sum([i*p for i,p in enumerate(bg)])/weight1
+        mean2 = np.sum([i*p for i,p in enumerate(fg)])/weight2
+        mean1, mean2 = np.nan_to_num(mean1), np.nan_to_num(mean2)
 
 
         #--------------------------------------------
         pT = histogram[i]/totalPixel 
         #--------------------------------------------
-        #valley.append((1-pT)*(weightB*weightF*(meanB-meanF)**2));
-        valley.append((1-pT)*(weightB*weightF*(meanB-meanF)**2));
+        #valley.append((1-pT)*(weight1*weight2*(mean1-mean2)**2));
+        valley.append((1-pT)*(weight1*weight2*(mean1-mean2)**2));
         
 
 
